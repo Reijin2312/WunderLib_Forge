@@ -1,0 +1,103 @@
+buildscript {
+    dependencies {}
+
+    repositories {
+        gradlePluginPortal()
+    }
+}
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
+
+archivesBaseName = project.archives_base_name
+version = project.mod_version
+group = project.maven_group
+
+repositories {
+    maven { url "https://maven.minecraftforge.net" }
+    maven { url "https://jitpack.io" }
+}
+
+print("wunderlib.gradle")
+
+minecraft {
+    mappings channel: "official", version: project.minecraft_version
+    runs {
+        client {
+            workingDirectory project.file("run")
+            property "forge.logging.markers", "REGISTRIES"
+            property "forge.logging.console.level", "debug"
+        }
+        server {
+            workingDirectory project.file("run")
+            property "forge.logging.markers", "REGISTRIES"
+            property "forge.logging.console.level", "debug"
+        }
+    }
+}
+
+dependencies {
+    minecraft "net.minecraftforge:forge:${project.minecraft_version}-${project.forge_version}"
+}
+
+processResources {
+    inputs.property "version", project.version
+    inputs.property "mod_id", project.mod_id
+    inputs.property "minecraft_version", project.minecraft_version
+    inputs.property "forge_version", project.forge_version
+
+    filesMatching("META-INF/mods.toml") {
+        expand(
+                "mod_id": project.mod_id,
+                "mod_name": project.mod_name,
+                "version": project.version,
+                "minecraft_version": project.minecraft_version,
+                "forge_version": project.forge_version
+        )
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    it.options.encoding = "UTF-8"
+    it.options.release = 17
+}
+
+java {
+    withSourcesJar()
+}
+
+jar {
+    from("LICENSE") {
+        rename { "${it}_${project.archivesBaseName}" }
+    }
+}
+
+configurations {
+    dev {
+        canBeResolved = false
+        canBeConsumed = true
+    }
+}
+
+artifacts {
+    dev jar
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact(jar)
+            artifact(sourcesJar)
+        }
+    }
+}
+
+def distDir = new File(rootProject.projectDir.parentFile, "betterx-dist 1.20.1")
+tasks.register("copyDistJars", Copy) {
+    dependsOn(tasks.named("jar"))
+    from(tasks.named("jar"))
+    into(distDir)
+}
+
+tasks.named("build") {
+    finalizedBy("copyDistJars")
+}
