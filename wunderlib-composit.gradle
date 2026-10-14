@@ -5,6 +5,17 @@ plugins {
     id 'net.minecraftforge.gradle' version "${forgegradle_version}"
     id 'maven-publish'
 }
+def componentGradleProperties = new Properties()
+def componentGradlePropertiesFile = file('gradle.properties')
+if (!componentGradlePropertiesFile.exists()) {
+    throw new GradleException("Missing component gradle.properties: ${componentGradlePropertiesFile}")
+}
+componentGradlePropertiesFile.withInputStream { stream ->
+    componentGradleProperties.load(stream)
+}
+componentGradleProperties.each { key, value ->
+    project.extensions.extraProperties.set(key.toString(), value)
+}
 
 print("wunderlib-composite.gradle")
 apply from: "wunderlib.gradle"
