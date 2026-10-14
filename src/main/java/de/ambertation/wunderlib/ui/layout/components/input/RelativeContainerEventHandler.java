@@ -3,14 +3,14 @@ package de.ambertation.wunderlib.ui.layout.components.input;
 import net.minecraft.client.gui.components.events.ContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
 import de.ambertation.wunderlib.ui.layout.values.Rectangle;
 
 import java.util.Optional;
 
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 public interface RelativeContainerEventHandler extends ContainerEventHandler {
     Rectangle getInputBounds();
 

@@ -2,14 +2,14 @@ package de.ambertation.wunderlib.ui.layout.components;
 
 import net.minecraft.network.chat.Component;
 
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
 import de.ambertation.wunderlib.ui.layout.components.render.RangeRenderer;
 import de.ambertation.wunderlib.ui.layout.values.Value;
 import de.ambertation.wunderlib.ui.vanilla.Slider;
 
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 public class Range<N extends Number> extends AbstractVanillaComponent<Slider<N>, Range<N>> {
     @FunctionalInterface
     public interface ValueChanged<N extends Number> {

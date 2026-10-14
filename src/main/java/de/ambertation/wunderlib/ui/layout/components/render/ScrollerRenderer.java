@@ -1,12 +1,12 @@
 package de.ambertation.wunderlib.ui.layout.components.render;
 
 
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
 import de.ambertation.wunderlib.ui.layout.values.Rectangle;
 
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 public interface ScrollerRenderer {
     default int scrollerHeight() {
         return 16;

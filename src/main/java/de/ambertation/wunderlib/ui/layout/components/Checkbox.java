@@ -5,10 +5,10 @@ import de.ambertation.wunderlib.ui.layout.values.Value;
 
 import net.minecraft.network.chat.Component;
 
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 public class Checkbox extends AbstractVanillaComponent<net.minecraft.client.gui.components.Checkbox, Checkbox> {
     public static SelectionChanged IGNORE_CHANGE = (a, b) -> {
     };

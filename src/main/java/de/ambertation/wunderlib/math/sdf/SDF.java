@@ -9,26 +9,18 @@ import de.ambertation.wunderlib.math.sdf.interfaces.Transformable;
 import de.ambertation.wunderlib.math.sdf.shapes.*;
 
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
-import com.mojang.serialization.DynamicOps;
-import com.mojang.datafixers.util.Pair;
+import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.KeyDispatchDataCodec;
 
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.NewRegistryEvent;
-import net.minecraftforge.registries.RegistryBuilder;
+import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
+import net.fabricmc.fabric.api.event.registry.RegistryAttribute;
 
 import java.util.Objects;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
-@Mod.EventBusSubscriber(modid = WunderLib.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public abstract class SDF {
 
     @FunctionalInterface
@@ -321,63 +313,15 @@ public abstract class SDF {
 
 
     //---------------------- SDF REGISTRY ----------------------
-    public static final ResourceKey<Registry<Codec<? extends SDF>>> SDF_REGISTRY_KEY =
-            ResourceKey.createRegistryKey(WunderLib.ID("sdf"));
-    public static Supplier<IForgeRegistry<Codec<? extends SDF>>> SDF_REGISTRY;
-    private static volatile Codec<SDF> CODEC_CACHE;
+    public static final MappedRegistry<Codec<? extends SDF>> SDF_REGISTRY = FabricRegistryBuilder
+            .<Codec<? extends SDF>>createSimple(null, WunderLib.ID("sdf"))
+            .attribute(RegistryAttribute.MODDED)
+            .buildAndRegister();
 
-    public static final Codec<SDF> CODEC = new Codec<>() {
-        @Override
-        public <T> DataResult<Pair<SDF, T>> decode(DynamicOps<T> ops, T input) {
-            return resolveCodec().decode(ops, input);
-        }
+    public static final Codec<SDF> CODEC = SDF_REGISTRY.byNameCodec()
+                                                       .dispatch((sdf) -> sdf.codec().codec(), Function.identity());
 
-        @Override
-        public <T> DataResult<T> encode(SDF input, DynamicOps<T> ops, T prefix) {
-            return resolveCodec().encode(input, ops, prefix);
-        }
-    };
-
-    @SubscribeEvent
-    public static void onNewRegistry(NewRegistryEvent event) {
-        if (SDF_REGISTRY != null) {
-            return;
-        }
-        SDF_REGISTRY = event.create(
-                new RegistryBuilder<Codec<? extends SDF>>().setName(SDF_REGISTRY_KEY.location()),
-                SDF::bootstrap
-        );
-    }
-
-    private static Codec<SDF> resolveCodec() {
-        Codec<SDF> cached = CODEC_CACHE;
-        if (cached != null) {
-            return cached;
-        }
-        synchronized (SDF.class) {
-            cached = CODEC_CACHE;
-            if (cached == null) {
-                IForgeRegistry<Codec<? extends SDF>> registry = getRegistry();
-                cached = registry.getCodec()
-                                 .dispatch((sdf) -> sdf.codec().codec(), Function.identity());
-                CODEC_CACHE = cached;
-            }
-        }
-        return cached;
-    }
-
-    private static IForgeRegistry<Codec<? extends SDF>> getRegistry() {
-        if (SDF_REGISTRY == null) {
-            throw new IllegalStateException("SDF registry has not been created yet.");
-        }
-        IForgeRegistry<Codec<? extends SDF>> registry = SDF_REGISTRY.get();
-        if (registry == null) {
-            throw new IllegalStateException("SDF registry has not been initialized yet.");
-        }
-        return registry;
-    }
-
-    static void bootstrap(IForgeRegistry<Codec<? extends SDF>> registry) {
+    static void bootstrap(Registry<Codec<? extends SDF>> registry) {
         register(registry, "union", SDFUnion.CODEC);
         register(registry, "intersect", SDFIntersection.CODEC);
         register(registry, "dif", SDFDifference.CODEC);
@@ -391,17 +335,15 @@ public abstract class SDF {
     }
 
     static Codec<? extends SDF> register(
-            IForgeRegistry<Codec<? extends SDF>> registry,
+            Registry<Codec<? extends SDF>> registry,
             String name,
             KeyDispatchDataCodec<? extends SDF> codec
     ) {
-        Codec<? extends SDF> value = codec.codec();
-        registry.register(WunderLib.ID(name), value);
-        return value;
+        return Registry.register(registry, WunderLib.ID(name), codec.codec());
     }
 
     @ApiStatus.Internal
     public static void ensureStaticallyLoaded() {
-        // Registry contents are initialized via NewRegistryEvent.
+        bootstrap(SDF_REGISTRY);
     }
 }

@@ -13,47 +13,28 @@ version = project.mod_version
 group = project.maven_group
 
 repositories {
-    maven { url "https://libraries.minecraft.net" }
-    maven { url "https://maven.minecraftforge.net" }
-    maven { url "https://jitpack.io" }
+    maven { url "https://maven.fabricmc.net/" }
+    maven { url 'https://jitpack.io' }
 }
 
+loom {
+
+}
 print("wunderlib.gradle")
 
-minecraft {
-    mappings channel: "official", version: project.minecraft_version
-    runs {
-        client {
-            workingDirectory project.file("run")
-            property "forge.logging.markers", "REGISTRIES"
-            property "forge.logging.console.level", "debug"
-        }
-        server {
-            workingDirectory project.file("run")
-            property "forge.logging.markers", "REGISTRIES"
-            property "forge.logging.console.level", "debug"
-        }
-    }
-}
-
 dependencies {
-    minecraft "net.minecraftforge:forge:${project.minecraft_version}-${project.forge_version}"
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings loom.officialMojangMappings()
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 }
+apply from: "wunderlib-include.gradle"
+
 
 processResources {
     inputs.property "version", project.version
-    inputs.property "mod_id", project.mod_id
-    inputs.property "minecraft_version", project.minecraft_version
-    inputs.property "forge_version", project.forge_version
 
-    filesMatching("META-INF/mods.toml") {
-        expand(
-                "mod_id": project.mod_id,
-                "mod_name": project.mod_name,
-                "version": project.version,
-                "minecraft_version": project.minecraft_version,
-                "forge_version": project.forge_version
-        )
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version
     }
 }
 
@@ -63,6 +44,9 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 java {
+    // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
+    // if it is present.
+    // If you remove this line, sources will not be generated.
     withSourcesJar()
 }
 
@@ -83,22 +67,26 @@ artifacts {
     dev jar
 }
 
+// configure the maven publication
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            artifact(jar)
-            artifact(sourcesJar)
+            // add all the jars that should be included when publishing to maven
+            artifact(remapJar) {
+                builtBy remapJar
+            }
+            artifact(sourcesJar) {
+                builtBy remapSourcesJar
+            }
         }
+    }
+
+    // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
+    repositories {
+        // Add repositories to publish to here.
+        // Notice: This block does NOT have the same function as the block in the top level.
+        // The repositories here will be used for publishing your artifact, not for
+        // retrieving dependencies.
     }
 }
 
-def distDir = new File(rootProject.projectDir.parentFile, "betterx-dist 1.20.1")
-tasks.register("copyDistJars", Copy) {
-    dependsOn(tasks.named("jar"))
-    from(tasks.named("jar"))
-    into(distDir)
-}
-
-tasks.named("build") {
-    finalizedBy("copyDistJars")
-}

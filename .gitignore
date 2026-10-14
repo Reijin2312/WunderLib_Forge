@@ -1,7 +1,5 @@
 # Project exclude paths
 /.gradle/
-/.gradle-local/
-/.gradle-user-home/
 /.idea/
 /run/
 /run-server/

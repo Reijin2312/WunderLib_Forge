@@ -1,8 +1,7 @@
 plugins {
-    id 'java-library'
     id 'idea'
     id 'eclipse'
-    id 'net.minecraftforge.gradle' version "${forgegradle_version}"
+    id 'fabric-loom'
     id 'maven-publish'
 }
 def componentGradleProperties = new Properties()

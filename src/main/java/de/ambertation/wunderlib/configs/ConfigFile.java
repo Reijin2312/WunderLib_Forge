@@ -4,9 +4,9 @@ package de.ambertation.wunderlib.configs;
 import de.ambertation.wunderlib.WunderLib;
 import de.ambertation.wunderlib.utils.Version;
 
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fml.loading.FMLPaths;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.fabricmc.loader.api.FabricLoader;
 
 import com.google.gson.*;
 
@@ -34,7 +34,7 @@ public class ConfigFile {
     }
 
     public ConfigFile(Version.ModVersionProvider versionProvider, String basePath, String category) {
-        final Path dir = FMLPaths.CONFIGDIR.get().resolve(basePath);
+        final Path dir = FabricLoader.getInstance().getConfigDir().resolve(basePath);
         path = dir.resolve(category + ".json").toFile();
         this.category = basePath + "." + category;
         this.versionProvider = versionProvider;
@@ -169,7 +169,7 @@ public class ConfigFile {
      *
      * @return all stored values
      */
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public List<Value<?, ?>> getAllValues() {
         return knownValues;
     }
@@ -179,7 +179,7 @@ public class ConfigFile {
      *
      * @return All visible Values
      */
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public List<Value<?, ?>> getAllVisibleValues() {
         List<Value<?, ?>> values = new ArrayList<>();
         for (Value<?, ?> v : knownValues) {
@@ -196,7 +196,7 @@ public class ConfigFile {
      * @param group The group to filter for
      * @return All visible Values in the given group
      */
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public List<Value<?, ?>> getAllVisibleValues(Group group) {
         List<Value<?, ?>> values = new ArrayList<>();
         for (Value<?, ?> v : knownValues) {
@@ -215,7 +215,7 @@ public class ConfigFile {
      * @param configFiles an array of config files
      * @return All visible Values in the given group
      */
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public static List<Value<?, ?>> getAllVisibleValues(Group group, List<ConfigFile> configFiles) {
         final List<Value<?, ?>> values = new ArrayList<>();
         for (ConfigFile c : configFiles) {
@@ -235,7 +235,7 @@ public class ConfigFile {
      *
      * @return All stored groups
      */
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public List<Group> getAllGroups() {
         List<Group> groups = new ArrayList<>();
         for (Value<?, ?> v : knownValues) {
@@ -253,7 +253,7 @@ public class ConfigFile {
      * @param configFiles an array of config files
      * @return All stored groups
      */
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public static List<Group> getAllGroups(List<ConfigFile> configFiles) {
         List<Group> groups = new ArrayList<>();
         for (ConfigFile c : configFiles) {
@@ -267,7 +267,7 @@ public class ConfigFile {
         return groups;
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public static String getAllCategories(List<ConfigFile> configFiles) {
         StringBuilder sb = new StringBuilder();
         for (ConfigFile c : configFiles) {

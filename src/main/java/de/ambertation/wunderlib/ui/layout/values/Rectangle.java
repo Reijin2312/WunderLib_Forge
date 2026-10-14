@@ -1,11 +1,11 @@
 package de.ambertation.wunderlib.ui.layout.values;
 
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
 import de.ambertation.wunderlib.math.Float2;
 
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 public class Rectangle {
     public static final Rectangle ZERO = new Rectangle(0, 0, 0, 0);
     public final int left;

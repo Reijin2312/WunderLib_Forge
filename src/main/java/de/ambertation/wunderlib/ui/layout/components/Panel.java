@@ -10,13 +10,13 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
 import java.util.List;
 import org.jetbrains.annotations.Nullable;
 
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 public class Panel implements ComponentWithBounds, RelativeContainerEventHandler, NarratableEntry, Renderable {
     protected LayoutComponent<?, ?> child;
     List<? extends GuiEventListener> listeners = List.of();

@@ -10,14 +10,14 @@ import de.ambertation.wunderlib.ui.layout.values.Value;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
 import java.util.LinkedList;
 import java.util.List;
 import org.jetbrains.annotations.Nullable;
 
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 public class Container extends LayoutComponent<Container.ContainerRenderer, Container> implements RelativeContainerEventHandler {
     public static class ContainerRenderer implements ComponentRenderer {
         Container linkedContainer;
